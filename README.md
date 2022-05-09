@@ -1,4 +1,4 @@
-# C-Basic-Shop
+# C# Basic Shop
 
 Basic web shop application made withing subject: Web Applications for .NET platform.
 
