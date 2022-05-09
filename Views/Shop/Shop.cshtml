@@ -1,0 +1,177 @@
+﻿@model IEnumerable<Lista10.Models.Category>
+@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+@{
+    ViewData["Title"] = "Shop";
+}
+
+<h1>Shop</h1>
+
+<div class="row">
+    <div class="col-2">
+        <h4>Categories</h4>
+        <div class="list-group" id="list">
+            @{ Category picked = null; int lastId = 0;}
+            @foreach (var item in Model)
+            {
+                if (ViewData["Cat"] == item.Name)
+                {
+                    picked = item;
+
+                    <a class="list-group-item list-group-item-action active" asp-route="Shop" asp-route-id="@item.Id">
+
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </a>
+                }
+                else
+                {
+                    <a class="list-group-item list-group-item-action" asp-route="Shop" asp-route-id="@item.Id">
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </a>
+                }
+            }
+            @{if (picked == null && Model.Count() > 0) { Model.First(); picked = Model.First(); }
+            }
+            <input type="hidden" id="pickedId" value=@picked.Id />
+            <input type="hidden" id="pickedName" value=@picked.Name />
+        </div>
+    </div>
+    <div class="col-8">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Price
+                    </th>
+                    <th>
+                        Image
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="articles">
+
+                @{ if (picked != null)
+                    {
+                        for (int i = 0; i < 3; i++)
+                        {
+                            if (picked.Articles.Count > i)
+                            {
+                                var article = picked.Articles.ToArray()[i];
+                                lastId = article.Id;
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => article.Name)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => article.Price)
+                                    </td>
+                                    <td>
+                                        <img src="\upload\@article.Image" alt="@article.Image" width="250" height="120" />
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => article.Category.Name)
+                                    </td>
+                                    @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+                                    {
+                                        <td>
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td>
+                                            <a asp-controller="Shop" asp-action="More" asp-route-id="@article.Id">Buy</a>
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+        @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+        {
+            <input type="hidden" id="user" value="admin" />
+        }
+        else
+        {
+            <input type="hidden" id="user" value="user" />
+        }
+        <input type="hidden" id="lastId" value=@lastId />
+        <button id="next" onclick="showNext()">Pokaż więcej</button>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        function showNext() {
+            var pickedId = document.getElementById("pickedId").value;
+            var pickedName = document.getElementById("pickedName").value;
+            var lastId = document.getElementById("lastId").value;
+            var user = document.getElementById("user").value;
+
+            const xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+                if (this.status === 200) {
+                    try {
+                        const articles = JSON.parse(this.responseText);
+                         if (articles.length == 0) {
+                            document.getElementById("next").remove();
+                        }
+                        for (i = 0; i < articles.length; i++) {
+                            const art = articles[i];
+                            var tr = document.createElement("tr");
+                            var td1 = document.createElement("td");
+                            td1.innerText = art.name;
+                            var td2 = document.createElement("td");
+                            td2.innerText = art.price;
+                            var td3 = document.createElement("td");
+                            var image = document.createElement("img");
+                            image.width = 250;
+                            image.height = 120;
+                            image.src = "\\upload\\" + art.image;
+                            image.alt = art.image;
+                            td3.appendChild(image);
+                            var td4 = document.createElement("td");
+                            td4.innerText = pickedName;
+                            tr.appendChild(td1);
+                            tr.appendChild(td2);
+                            tr.appendChild(td3);
+                            tr.appendChild(td4);
+                            var td5 = document.createElement("td");
+                            if (user == "user") {
+                                var link = document.createElement("a");
+                                link.href = "/Shop/More/" + art.id;
+                                link.innerText = "Buy";
+                                td5.appendChild(link);
+                            }
+                            tr.appendChild(td5);
+                            document.getElementById("articles").appendChild(tr);
+                            document.getElementById("lastId").value = art.id;
+                        }
+                    }
+                    catch (e) {
+                        console.warn('error in JSON');
+                    }
+                } else if (this.status === 204) {
+                    document.getElementById("next").remove();
+                } else {
+                    console.warn(this.status);
+                }
+            };
+            let str = "/api/article/next/" + pickedId + "/" + lastId;
+            xhr.open("get", str);
+            xhr.send();
+        }
+    </script>
+ }

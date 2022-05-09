@@ -1,0 +1,105 @@
+﻿@model IEnumerable<Lista10.Models.Article>
+@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+
+@{
+    ViewData["Title"] = "Basket";
+}
+
+<h1>Zamówienie</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Image)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Category)
+            </th>
+            <th>
+                Quantity
+            </th>
+            <th>Total</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    <img src="\upload\@item.Image" alt="@item.Image" width="150" height="70" />
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Category.Name)
+                </td>
+                <td>
+                    @ViewData[item.Id.ToString()]
+                </td>
+                <td>
+                    @ViewData["total" + item.Id.ToString()]
+                </td>
+                <td>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<h3>Total price: @ViewData["total"]</h3>
+
+<form asp-action="Confirm">
+    <div class="form-group">
+        <label class="control-label">Imię i nazwisko</label>
+        <input type="text" id="name" name="name" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Ulica</label>
+        <input type="text" id="street" name="street" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Nr domu</label>
+        <input type="number" id="house" name="house" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Numer mieszkania</label>
+        <input type="number" id="flat" name="flat" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Kod pocztowy</label>
+        <input type="text" id="postalCode" name="postalCode" class="form-control" required/>
+    </div>
+    <div class="form-group">
+        <label class="control-label">Miasto</label>
+        <input type="text" id="city" name="city" class="form-control" required/>
+    </div>
+    <br />
+    <br />
+    <div class="form-group">
+        <label class="control-label">Sposób płatności</label>
+        <select name="payment" id="payment" class="form-control">
+            <option value="gotówka">Gotówka</option>
+            <option value="karta">Karta kredytowa</option>
+            <option value="GooglePay">GooglePay</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Potwierdź zamówienie" class="btn btn-primary" />
+    </div>
+</form>
+

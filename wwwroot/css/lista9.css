@@ -1,0 +1,43 @@
+﻿
+/* CSS dla zadań */
+div.set {
+    background-color: #E68A80;
+    border: 8px solid black;
+}
+
+div.draw {
+    background-color: #C4E5E5;
+    border: 5px dashed #84E6DE;
+}
+
+div.guess {
+    background-color: #92E68F;
+    border: 5px solid darkgreen;
+    border-radius: 30px;
+}
+
+div.hit {
+    background-color: greenyellow;
+    border: 1px solid green;
+    font-size: large;
+}
+
+div.toohigh {
+    background-color: darkred;
+    border: 2px solid red;
+    color: white;
+}
+
+div.toolow {
+    background-color: darkblue;
+    border: 2px solid blue;
+    color: white;
+}
+
+.set > h3 {
+    display: none;
+}
+
+.draw > h3 {
+    display: none;
+}
